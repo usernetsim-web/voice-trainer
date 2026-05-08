@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Voice English Trainer</title>
+</head>
+<body>
+
+<h2 id="question">Нажми Start</h2>
+
+<p>⭐ XP: <span id="xp">0</span></p>
+<p>❤️ Ошибки: <span id="err">0</span></p>
+
+<button onclick="startGame()">▶ Start</button>
+
+<p id="result"></p>
+
+<script>
+const questions = [
+  { ru: "Вы можете мне помочь?", en: "can you help me" },
+  { ru: "Позвольте мне помочь вам", en: "let me help you" },
+  { ru: "Как тебя зовут?", en: "what is your name" }
+];
+
+let index = 0;
+let xp = 0;
+let errors = 0;
+let forceMode = false;
+
+let rec;
+
+const q = document.getElementById("question");
+const result = document.getElementById("result");
+
+function speak(text, lang) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+
+  const voices = speechSynthesis.getVoices();
+
+  if (lang === "en-US") {
+    const enVoice = voices.find(v => v.lang.includes("en"));
+    if (enVoice) u.voice = enVoice;
+  }
+
+  if (lang === "ru-RU") {
+    const ruVoice = voices.find(v => v.lang.includes("ru"));
+    if (ruVoice) u.voice = ruVoice;
+  }
+
+  speechSynthesis.speak(u);
+}
+
+function loadQuestion() {
+  let item = questions[index];
+  q.innerText = item.ru;
+
+  speak(item.ru, "ru-RU");
+}
+
+function updateUI() {
+  document.getElementById("xp").innerText = xp;
+  document.getElementById("err").innerText = errors;
+}
+
+function startListening() {
+  rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  rec.lang = "en-US";
+  rec.interimResults = false;
+
+  rec.onresult = function(e) {
+    let spoken = e.results[0][0].transcript.toLowerCase().trim();
+    let correct = questions[index].en;
+
+    // 🔴 режим после 3 ошибок
+    if (forceMode) {
+      if (spoken === correct) {
+        xp += 10;
+
+        result.innerText = "✔ правильно!";
+        speak("Правильно", "ru-RU");
+
+        forceMode = false;
+        errors = 0;
+        index = (index + 1) % questions.length;
+
+        setTimeout(loadQuestion, 1000);
+      } else {
+        result.innerText = "📢 повтори: " + correct;
+        speak(correct, "en-US");
+      }
+
+      updateUI();
+      return;
+    }
+
+    // 🟡 обычный режим
+    if (spoken === correct) {
+      xp += 10;
+
+      result.innerText = "✔ правильно!";
+      speak("Правильно", "ru-RU");
+
+      errors = 0;
+      index = (index + 1) % questions.length;
+
+      setTimeout(loadQuestion, 1000);
+    } else {
+      errors++;
+
+      if (errors >= 3) {
+        forceMode = true;
+
+        result.innerText = "📢 правильный ответ: " + correct;
+
+        speak("Правильный ответ", "ru-RU");
+
+        setTimeout(() => {
+          speak(correct, "en-US");
+        }, 1000);
+
+      } else {
+        result.innerText = "✖ ты сказал: " + spoken + " (" + errors + "/3)";
+      }
+    }
+
+    updateUI();
+  };
+
+  rec.onend = function() {
+    rec.start();
+  };
+
+  rec.start();
+}
+
+function startGame() {
+  loadQuestion();
+  startListening();
+}
+
+updateUI();
+</script>
+
+</body>
+</html>

@@ -3,8 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <title>Voice English Trainer</title>
+
+<style>
+body {
+  background: black;
+  color: white;
+
+  margin: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100vh;
+
+  text-align: center;
+
+  font-family: Arial, sans-serif;
+}
+
+/* 🔥 увеличил блок */
+div {
+  transform: scale(1.25);
+}
+
+/* 🔥 увеличил кнопку и сделал её ярче */
+button {
+  background: #00A550;
+  color: white;
+
+  border: none;
+  border-radius: 18px;
+
+  padding: 22px 60px;
+
+  font-size: 34px;
+
+  cursor: pointer;
+}
+
+button:hover {
+  background: #006B3C;
+}
+</style>
+
 </head>
 <body>
+
+<div>
 
 <h2 id="question">Нажми Start</h2>
 
@@ -14,6 +60,8 @@
 <button onclick="startGame()">▶ Start</button>
 
 <p id="result"></p>
+
+</div>
 
 <script>
 const questions = [
@@ -72,11 +120,9 @@ function startListening() {
     let spoken = e.results[0][0].transcript.toLowerCase().trim();
     let correct = questions[index].en;
 
-    // 🔴 режим после 3 ошибок
     if (forceMode) {
       if (spoken === correct) {
         xp += 10;
-
         result.innerText = "✔ правильно!";
         speak("Правильно", "ru-RU");
 
@@ -94,10 +140,8 @@ function startListening() {
       return;
     }
 
-    // 🟡 обычный режим
     if (spoken === correct) {
       xp += 10;
-
       result.innerText = "✔ правильно!";
       speak("Правильно", "ru-RU");
 

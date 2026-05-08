@@ -21,6 +21,30 @@ body {
 
   font-family: Arial, sans-serif;
 }
+
+/* 🔥 увеличил блок */
+div {
+  transform: scale(1.25);
+}
+
+/* 🔥 увеличил кнопку и сделал её ярче */
+button {
+  background: #228B22;
+  color: white;
+
+  border: none;
+  border-radius: 18px;
+
+  padding: 22px 60px;
+
+  font-size: 34px;
+
+  cursor: pointer;
+}
+
+button:hover {
+  background: #00ff77;
+}
 </style>
 
 </head>
@@ -96,11 +120,9 @@ function startListening() {
     let spoken = e.results[0][0].transcript.toLowerCase().trim();
     let correct = questions[index].en;
 
-    // 🔴 режим после 3 ошибок
     if (forceMode) {
       if (spoken === correct) {
         xp += 10;
-
         result.innerText = "✔ правильно!";
         speak("Правильно", "ru-RU");
 
@@ -118,10 +140,8 @@ function startListening() {
       return;
     }
 
-    // 🟡 обычный режим
     if (spoken === correct) {
       xp += 10;
-
       result.innerText = "✔ правильно!";
       speak("Правильно", "ru-RU");
 

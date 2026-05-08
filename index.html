@@ -22,12 +22,10 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* 🔥 увеличил блок */
 div {
   transform: scale(1.25);
 }
 
-/* 🔥 увеличил кнопку и сделал её ярче */
 button {
   background: #00A550;
   color: white;
@@ -76,11 +74,16 @@ let errors = 0;
 let forceMode = false;
 
 let rec;
+let isSpeaking = false; // 🔥 FIX 1
 
 const q = document.getElementById("question");
 const result = document.getElementById("result");
 
 function speak(text, lang) {
+
+  isSpeaking = true;
+  if (rec) rec.stop(); // 🔥 FIX 1
+
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang;
 
@@ -95,6 +98,14 @@ function speak(text, lang) {
     const ruVoice = voices.find(v => v.lang.includes("ru"));
     if (ruVoice) u.voice = ruVoice;
   }
+
+  u.onend = () => {
+    isSpeaking = false;
+
+    setTimeout(() => {
+      if (rec) rec.start();
+    }, 500);
+  };
 
   speechSynthesis.speak(u);
 }
@@ -113,10 +124,14 @@ function updateUI() {
 
 function startListening() {
   rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
   rec.lang = "en-US";
   rec.interimResults = false;
 
   rec.onresult = function(e) {
+
+    if (isSpeaking) return; // 🔥 FIX 1
+
     let spoken = e.results[0][0].transcript.toLowerCase().trim();
     let correct = questions[index].en;
 
@@ -172,7 +187,11 @@ function startListening() {
   };
 
   rec.onend = function() {
-    rec.start();
+    if (!isSpeaking) { // 🔥 FIX 2
+      setTimeout(() => {
+        rec.start();
+      }, 1200);
+    }
   };
 
   rec.start();

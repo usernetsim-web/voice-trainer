@@ -22,12 +22,10 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* 🔥 увеличил блок */
 div {
   transform: scale(1.25);
 }
 
-/* 🔥 увеличил кнопку и сделал её ярче */
 button {
   background: #00A550;
   color: white;
@@ -172,12 +170,15 @@ function startListening() {
   };
 
   rec.onend = function() {
-    setTimeout(() => {
-      rec.start();
-    }, 10000); // 🔥 задержка 10 секунд
+    rec.start();
   };
 
   rec.start();
+
+  // 🔥 ВАЖНО: 10 секунд слушает, потом стоп
+  setTimeout(() => {
+    rec.stop();
+  }, 10000);
 }
 
 function startGame() {
